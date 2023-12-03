@@ -125,6 +125,85 @@
 	<script>
 		$(document).ready(function () {
 			var form = document.getElementById("formId");
+			var guid = generateGUID();
+			var alphabet = /^[a-zA-Z]+$/;
+			var number = /^[0-9]+$/;
+			var p3pattern = /^0\.\d+$/;
+			var p2pattern = /^0\.\d$/;
+			function submitForm(event) {
+				//Preventing page refresh
+				$('#loader').addClass('overlay');
+				// setTimeout(() => {
+				// 	$('#loader').removeClass('overlay');
+				// }, 6000);
+				SFMCEmailAPI();
+				event.preventDefault();
+			}
+
+			function generateGUID() {
+				return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+					(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+				);
+			}
+			console.log(guid);
+
+			//Calling a function during form submission.
+			// form.addEventListener('submit', submitForm);
+
+			$('#formId').on('keydown', 'input, select', function (event) {
+				if (event.key === 'Tab') {
+					validateField(this);
+				}
+			});
+
+			$('#pname, #gender, #age, #hypertension, #heartdisease, #smoking, #bmi, #hemoglobin, #glucose')
+					.on('keyup paste change', function () {
+						validateField(this);
+			});
+			function validateField(field){
+				let pname = document.forms["formId"]["pname"].value;
+				let gender = document.forms["formId"]["gender"].value;
+				let age = document.forms["formId"]["age"].value;
+				let hypertension = document.forms["formId"]["hypertension"].value;
+				let heartDisease = document.forms["formId"]["heartdisease"].value;
+				let smoking = document.forms["formId"]["smoking"].value;
+				let bmi = document.forms["formId"]["bmi"].value;
+				let hemoglobin = document.forms["formId"]["hemoglobin"].value;
+				let glucose = document.forms["formId"]["glucose"].value;
+				let fieldValue = field.value.trim();
+
+				$(field.parentElement.lastElementChild).addClass('display-none');
+				switch (field.type) {
+					case "text":
+						// Check if the entered value is alphabetic
+						if(!alphabet.test(fieldValue)){
+							$(field.parentElement.lastElementChild).removeClass('display-none');
+						}
+						break;
+					case "number":
+						// Check if the entered value is numeric
+						if(isNaN(fieldValue) || fieldValue === ""){
+							$(field.parentElement.lastElementChild).removeClass('display-none');
+						}
+						break;
+					case "select-one":
+						// Check if a valid option is selected
+						if(fieldValue === "Select"){
+							$(field.parentElement.lastElementChild).removeClass('display-none');
+						}
+						break;
+				}
+
+				if(pname && bmi && hemoglobin && glucose && alphabet.test(pname) && !isNaN(bmi) && !isNaN(hemoglobin)
+						&& !isNaN(glucose) && smoking !== "Select" && gender !== "Select" && hypertension !== "Select"
+						&& heartDisease !== "Select"){
+					$('.submit').prop('disabled', false);
+				}
+				else{
+					$('.submit').prop('disabled', true);
+					event.preventDefault();
+				}
+			};
 
 			function SFMCEmailAPI() {
 				let pname = document.forms["formId"]["pname"].value;
@@ -168,7 +247,29 @@
 			}
 
 			$('.submit').click(function (event) {
-				SFMCEmailAPI();
+				let pname = document.forms["formId"]["pname"].value;
+				let gender = document.forms["formId"]["gender"].value;
+				let age = document.forms["formId"]["age"].value;
+				let hypertension = document.forms["formId"]["hypertension"].value;
+				let heartDisease = document.forms["formId"]["heartdisease"].value;
+				let smoking = document.forms["formId"]["smoking"].value;
+				let bmi = document.forms["formId"]["bmi"].value;
+				let hemoglobin = document.forms["formId"]["hemoglobin"].value;
+				let glucose = document.forms["formId"]["glucose"].value;
+
+				if(pname && bmi && hemoglobin && glucose && alphabet.test(pname) && !isNaN(bmi) && !isNaN(hemoglobin)
+						&& !isNaN(glucose) && smoking !== "Select" && gender !== "Select" && hypertension !== "Select"
+						&& heartDisease !== "Select"){
+					$('#loader').addClass('overlay');
+					$('.submit').prop('disabled', false);
+					$('#validation').hide();
+					SFMCEmailAPI();
+				}
+				else{
+					$('#validation').show();
+					$('.submit').prop('disabled', true);
+					event.preventDefault();
+				}
 			});
 		});
 	</script>

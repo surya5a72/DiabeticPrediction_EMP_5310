@@ -7,6 +7,8 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
@@ -71,6 +73,52 @@ def detect_diabetic():
         df['gender'] = df['gender'].replace(gender_mapping)
         df['smoking_history'] = df['smoking_history'].replace(smoking_mapping)
         df.head()
+        df.info()
+        df.describe().transpose()
+        df.shape
+        df.isnull().sum()
+        df.duplicated().sum()
+        df.drop_duplicates()
+        df.shape
+        df.info()
+        df.describe([0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.99]).T
+        df.diabetes.unique()
+        df["diabetes"].value_counts() * 100 / len(df)
+        df.diabetes.value_counts()
+
+        df.hist(figsize=(15, 15))
+
+        f, ax = plt.subplots(figsize=[20, 15])
+        sns.heatmap(df.corr(), annot=True, fmt=".2f", ax=ax, cmap="magma")
+        ax.set_title("Correlation Matrix", fontsize=20)
+        plt.show()
+
+        df.groupby("diabetes").agg({"heart_disease": "mean"})
+        df.groupby("diabetes").agg({"age": "mean"})
+        df.groupby("diabetes").agg({"age": "max"})
+        df.groupby("diabetes").agg({"hypertension": "mean"})
+        df.groupby("diabetes").agg({"hypertension": "max"})
+        df.groupby("diabetes").agg({"blood_glucose_level": "mean"})
+        df.groupby("diabetes").agg({"blood_glucose_level": "max"})
+        df.groupby("diabetes").agg({"bmi": "mean"})
+
+        pie_colors = ['skyblue', 'orange']
+        countplot_colors = ['skyblue', 'orange']
+
+        f, ax = plt.subplots(1, 2, figsize=(18, 8))
+
+        # Pie chart
+        df['diabetes'].value_counts().plot.pie(explode=[0, 0.1], autopct='%1.1f%%', ax=ax[0], shadow=True,
+                                               colors=pie_colors)
+        ax[0].set_title('target')
+        ax[0].set_ylabel('')
+
+        # Countplot
+        sns.countplot(x='diabetes', data=df, ax=ax[1], palette=countplot_colors)
+        ax[1].set_title('diabetes')
+
+        plt.show()
+
         x = df.iloc[:, :-1].values
         y = df.iloc[:, -1].values
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.20)
